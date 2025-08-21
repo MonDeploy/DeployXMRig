@@ -14,7 +14,6 @@ USE_TLS=true
 POOL=("pool.supportxmr.com" "443" "3333")
 
 # Mining CPU settings
-# We will calculate threads dynamically: total cores - 1
 CPU_CORES=$(nproc)
 MINER_THREADS=$(( CPU_CORES > 1 ? CPU_CORES - 1 : 1 ))
 MAX_THREADS_HINT=90  # percent of allowed threads
@@ -35,7 +34,8 @@ install_deps_debian() {
   echo "[*] Installing dependencies for Debian/Ubuntu..."
   apt update
   apt install -y git build-essential cmake automake libtool autoconf \
-                 libhwloc-dev libuv1-dev libssl-dev ca-certificates
+                 libhwloc-dev libuv1-dev libssl-dev ca-certificates \
+                 openssl pkg-config
 }
 
 install_deps_rhel() {
@@ -62,7 +62,11 @@ build_xmrig() {
   git clone https://github.com/xmrig/xmrig.git
   cd xmrig
   mkdir build && cd build
-  cmake .. -DXMRIG_DEPS=ON -DWITHOUT_DEVMINER=ON -DCMAKE_BUILD_TYPE=Release
+  cmake .. -DXMRIG_DEPS=ON -DWITHOUT_DEVMINER=ON -DCMAKE_BUILD_TYPE=Release \
+    -DOPENSSL_ROOT_DIR=/usr \
+    -DOPENSSL_CRYPTO_LIBRARY=/usr/lib/x86_64-linux-gnu/libcrypto.so \
+    -DOPENSSL_SSL_LIBRARY=/usr/lib/x86_64-linux-gnu/libssl.so \
+    -DOPENSSL_INCLUDE_DIR=/usr/include
   make -j$(nproc)
 
   echo "[*] Installing into $INSTALL_DIR"
