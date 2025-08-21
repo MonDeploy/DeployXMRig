@@ -122,7 +122,7 @@ After=network.target
 
 [Service]
 User=$USER
-ExecStart=$INSTALL_DIR/xmrig -c $INSTALL_DIR/config.json
+ExecStart=$INSTALL_DIR/xmrig -c $INSTALL_DIR/config.json --no-color
 Restart=always
 Nice=10
 CPUWeight=1
